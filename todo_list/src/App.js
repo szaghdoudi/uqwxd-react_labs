@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import "./App.css";
 const App = () => {
   const [todos, setTodos] = useState([]);
+  const [todoEditing, setTodoEditing] = useState(null);
   
   function handleSubmit(e){
     e.preventDefault();
@@ -36,10 +37,17 @@ const App = () => {
       setTodos(updatedTodos);
   }
   
+  function submitEdits(newTodo){
+    const updatedTodos = [...todos].map((todo)=>{
+      if(todo.id === newTodo.id){
+        todo.text = document.getElementById(newTodo.id).value;
+      }
+      return todo;
+    })
+    setTodos(updatedTodos);
+    setTodoEditing(null);
 
-
-  
-  // Add the submitEdits code here
+  }
 
   
 return(
@@ -51,10 +59,30 @@ return(
   </form>
   {todos.map((todo)=>
     <div className="todo" key={todo.id}>
-      <div className="todo-text">{todo.text}
+      <div className="todo-text">
+       {/* Add checkbox for toggle complete */}
         <input type="checkbox" id="completed" checked={todo.completed} onChange={()=>toggleComplete(todo.id)}></input>
+
+        {/*if it's edit mode, display input box, else display text*/}
+        {todo.id === todoEditing?
+          (<input type="text" id={todo.id}
+            defaultValue={todo.text}
+          />)
+          :
+          (<div>{todo.text}</div>)
+        }
       </div>
-      <button onClick={()=>deleteTodod(todo.id)}>Delete</button>
+      <div className="todo-actions">
+        {/*if it is edit mode, allow submit edit, else allow edit  */}
+        {todo.id === todoEditing ?
+        (
+          <button onClick={()=>submitEdits(todo)}>Submit Edits</button>
+        ):(
+          <button onClick={()=> setTodoEditing(todo.id)}>Edit</button>  
+        )
+        }
+        <button onClick={()=>deleteTodod(todo.id)}>Delete</button>
+      </div>  
     </div>
 
   )}
